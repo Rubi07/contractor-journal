@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../database/app_database.dart';
 import '../models/account.dart';
 import '../models/project.dart';
+import '../models/party.dart';
 import '../parser/parser.dart';
 
 class DraftScreen extends StatefulWidget {
@@ -21,6 +22,8 @@ class _DraftScreenState extends State<DraftScreen> {
   final _noteController = TextEditingController();
 
   List<Project> _projects = [];
+  List<Party> _parties = [];
+  int? _partyId;
   List<Account> _accounts = [];
   int? _projectId;
   int? _debitAccountId;
@@ -44,12 +47,15 @@ class _DraftScreenState extends State<DraftScreen> {
   Future<void> _loadOptions() async {
     final projects = await AppDatabase.instance.getProjects();
     final accounts = await AppDatabase.instance.getAccounts();
+    final parties = await AppDatabase.instance.getParties();
     final project = projects.where((item) => item.name == widget.draft.project).firstOrNull;
     final debit = accounts.where((item) => item.name == widget.draft.debitAcc).firstOrNull;
     final credit = accounts.where((item) => item.name == widget.draft.creditAcc).firstOrNull;
 
     if (!mounted) return;
     setState(() {
+      _parties = parties;
+      _partyId = widget.draft.partyId;
       _projects = projects;
       _accounts = accounts;
       _projectId = project?.id ?? projects.firstOrNull?.id;
@@ -85,6 +91,7 @@ class _DraftScreenState extends State<DraftScreen> {
 
     final values = <String, Object?>{
       'date': _date,
+      'party_id': _partyId,
       'project_id': _projectId,
       'debit_acc': _debitAccountId,
       'credit_acc': _creditAccountId,
@@ -133,6 +140,21 @@ class _DraftScreenState extends State<DraftScreen> {
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<int>(
+                  initialValue: _partyId,
+                  decoration: const InputDecoration(
+                    labelText: 'পক্ষ (কাস্টমার/সাপ্লায়ার)',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: _parties.map((party) {
+                    return DropdownMenuItem(
+                      value: party.id,
+                      child: Text('${party.name} (${party.type == 'customer' ? 'কাস্টমার' : 'সাপ্লায়ার'})'),
+                    );
+                  }).toList(),
+                  onChanged: (value) => setState(() => _partyId = value),
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<int>(

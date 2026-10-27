@@ -6,6 +6,7 @@ import '../models/journal_entry.dart';
 import '../parser/parser.dart';
 import 'draft_screen.dart';
 import 'ledger_screen.dart';
+import 'parties_screen.dart';
 import 'report_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -180,6 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final pages = [
       _buildHome(),
+      PartiesScreen(key: ValueKey('parties-$_refreshVersion')),
       LedgerScreen(key: ValueKey('ledger-$_refreshVersion')),
       ReportScreen(key: ValueKey('report-$_refreshVersion')),
     ];
@@ -198,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onDestinationSelected: (index) => setState(() => _navigationIndex = index),
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home_outlined), label: 'হোম'),
+          NavigationDestination(icon: Icon(Icons.people_outline), label: 'পক্ষ'),
           NavigationDestination(icon: Icon(Icons.menu_book_outlined), label: 'খতিয়ান'),
           NavigationDestination(icon: Icon(Icons.bar_chart_outlined), label: 'রিপোর্ট'),
         ],

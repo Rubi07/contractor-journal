@@ -5,6 +5,7 @@ class DraftEntry {
     required this.debitAcc,
     required this.creditAcc,
     required this.amount,
+    this.partyId,
     required this.note,
   });
 
@@ -13,6 +14,7 @@ class DraftEntry {
   String debitAcc;
   String creditAcc;
   double amount;
+  int? partyId;
   String note;
 }
 

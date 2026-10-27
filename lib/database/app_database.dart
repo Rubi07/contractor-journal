@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import '../models/account.dart';
 import '../models/journal_entry.dart';
 import '../models/project.dart';
+import '../models/party.dart';
 
 class AppDatabase {
   AppDatabase._();
@@ -19,7 +20,8 @@ class AppDatabase {
     final databasePath = await getDatabasesPath();
     return openDatabase(
       p.join(databasePath, 'contractor_journal.db'),
-      version: 1,
+      version: 2,
+      onUpgrade: _onUpgrade,
       onCreate: _onCreate,
     );
   }
@@ -48,11 +50,20 @@ class AppDatabase {
         amount REAL NOT NULL,
         note TEXT NOT NULL,
         created_at TEXT NOT NULL,
+        party_id INTEGER,
         FOREIGN KEY(project_id) REFERENCES projects(id),
         FOREIGN KEY(debit_acc) REFERENCES accounts(id),
         FOREIGN KEY(credit_acc) REFERENCES accounts(id)
       )
     ''');
+    await db.execute('''
+      CREATE TABLE parties(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        type TEXT NOT NULL
+      )
+    ''');
+
 
     await _seed(db);
   }
@@ -81,6 +92,44 @@ class AppDatabase {
     for (final account in accounts) {
       await db.insert('accounts', account);
     }
+    final parties = <Map<String, String>>[
+      {'name': 'রহিম সাহেব', 'type': 'customer'},
+      {'name': 'করিম ট্রেডার্স', 'type': 'supplier'},
+    ];
+    for (final party in parties) {
+      await db.insert('parties', party);
+    }
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS parties(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          type TEXT NOT NULL
+        )
+      ''');
+      await db.execute('ALTER TABLE entries ADD COLUMN party_id INTEGER');
+    }
+  }
+
+
+
+  Future<List<Party>> getParties() async {
+    final db = await database;
+    final rows = await db.query('parties', orderBy: 'name');
+    return rows.map(Party.fromMap).toList();
+  }
+
+  Future<int> insertParty(String name, String type) async {
+    final db = await database;
+    return db.insert('parties', {'name': name, 'type': type});
+  }
+
+  Future<int> deleteParty(int id) async {
+    final db = await database;
+    return db.delete('parties', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<List<Account>> getAccounts() async {

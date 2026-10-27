@@ -7,6 +7,7 @@ class JournalEntry {
     required this.creditAccountId,
     required this.amount,
     required this.note,
+    this.partyId,
     required this.createdAt,
   });
 
@@ -17,6 +18,7 @@ class JournalEntry {
   final int creditAccountId;
   final double amount;
   final String note;
+  final int? partyId;
   final String createdAt;
 
   factory JournalEntry.fromMap(Map<String, Object?> map) {
@@ -28,6 +30,7 @@ class JournalEntry {
       creditAccountId: map['credit_acc'] as int,
       amount: (map['amount'] as num).toDouble(),
       note: (map['note'] as String?) ?? '',
+      partyId: map['party_id'] as int?,
       createdAt: map['created_at'] as String,
     );
   }
@@ -40,6 +43,7 @@ class JournalEntry {
         'credit_acc': creditAccountId,
         'amount': amount,
         'note': note,
+        'party_id': partyId,
         'created_at': createdAt,
       };
 }
