@@ -1,1 +1,29 @@
-# contractor-journal
+# Contractor Journal
+
+Contractor Journal একটি ব্যক্তিগত, অফলাইন Android অ্যাপ। Bengali voice দিয়ে হিসাব লিখে draft যাচাই করা যায়; সব তথ্য ফোনের নিজের SQLite database-এ রাখা হয়।
+
+## APK তৈরি
+
+```bash
+flutter pub get
+flutter build apk --release
+```
+
+তৈরি APK পাওয়া যাবে এখানে:
+
+```text
+build/app/outputs/flutter-apk/app-release.apk
+```
+
+GitHub-এর `main` branch-এ push করলে Actions workflow স্বয়ংক্রিয়ভাবে APK তৈরি করে artifact হিসেবে রাখবে।
+
+## ফোনে ইনস্টল
+
+1. GitHub Actions থেকে `contractor-journal-release-apk` artifact ডাউনলোড করুন।
+2. APK ফোনে পাঠিয়ে খুলুন।
+3. Android-এর সুরক্ষা সেটিংসে প্রয়োজন হলে "Unknown apps" থেকে এই APK source অনুমোদন করুন।
+4. ইনস্টল করে Contractor Journal চালান। প্রথমবার microphone permission দিন।
+
+## Codespaces সতর্কতা
+
+GitHub Codespaces বা dev container-এর browser terminal থেকে microphone ব্যবহার করা যায় না। Voice recognition পরীক্ষা করতে phone/Android device-এ app চালাতে হবে।
